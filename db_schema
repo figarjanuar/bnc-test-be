@@ -1,0 +1,78 @@
+-- batch_transfer_app.corporations definition
+
+CREATE TABLE `corporations` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `bank_account_number` varchar(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `bank_account_number` (`bank_account_number`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- batch_transfer_app.otp_codes definition
+
+CREATE TABLE `otp_codes` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) NOT NULL,
+  `code` varchar(6) NOT NULL,
+  `expires_at` timestamp NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- batch_transfer_app.transaction_details definition
+
+CREATE TABLE `transaction_details` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `transaction_id` int DEFAULT NULL,
+  `to_bank_name` varchar(255) NOT NULL,
+  `to_account_no` varchar(20) NOT NULL,
+  `to_account_name` varchar(255) NOT NULL,
+  `transfer_amount` decimal(15,2) NOT NULL,
+  `description` text,
+  PRIMARY KEY (`id`),
+  KEY `transaction_id` (`transaction_id`),
+  CONSTRAINT `transaction_details_ibfk_1` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- batch_transfer_app.transactions definition
+
+CREATE TABLE `transactions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `reference_no` varchar(20) NOT NULL,
+  `corporate_id` int DEFAULT NULL,
+  `maker_id` int DEFAULT NULL,
+  `approver_id` int DEFAULT NULL,
+  `from_account_no` varchar(20) NOT NULL,
+  `total_amount` decimal(15,2) NOT NULL,
+  `total_records` int NOT NULL,
+  `instruction_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `transfer_date` date DEFAULT NULL,
+  `transfer_time` time DEFAULT NULL,
+  `status` enum('Awaiting Approval','Approved','Rejected') NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `reference_no` (`reference_no`),
+  KEY `corporate_id` (`corporate_id`),
+  KEY `maker_id` (`maker_id`),
+  KEY `approver_id` (`approver_id`),
+  CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`corporate_id`) REFERENCES `corporations` (`id`),
+  CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`maker_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `transactions_ibfk_3` FOREIGN KEY (`approver_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- batch_transfer_app.users definition
+
+CREATE TABLE `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `phone_number` varchar(20) NOT NULL,
+  `role` enum('Maker','Approver') NOT NULL,
+  `corporate_name` varchar(100) DEFAULT NULL,
+  `corporate_bank_account_number` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

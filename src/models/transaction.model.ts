@@ -3,7 +3,8 @@ import pool from '../config/database';
 export const getOverview = async (userId: number, role: string) => {
   let query = 'SELECT status, COUNT(*) as count FROM transactions'
   const params: any[] = [];
-
+  console.log(role);
+  
   if(role === 'Maker') {
     query += ' WHERE maker_id = ?'
     params.push(userId)
